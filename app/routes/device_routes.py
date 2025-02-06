@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends
 
-from app.auth import get_current_user
+from app.auth import role_checker
 from app.models.devices import Device
+from app.models.users import User
 
 router = APIRouter()
 
 
-@router.post("/devices", response_model=Device)
-async def create_journal(device: Device, current_user: str = Depends(get_current_user)):
+@router.post("/device", response_model=Device)
+async def register_device(
+    device: Device, user: User = Depends(role_checker(["admin"]))
+):
     await device.insert()
     return device

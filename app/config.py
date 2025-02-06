@@ -5,6 +5,8 @@ class Settings(BaseSettings):
     app_name: str = "Tom.Camp"
     database_url: str
     database_name: str
+    database_user: str
+    database_pass: str
     secret_key: str
     hash_algorithm: str
     initial_user_name: str

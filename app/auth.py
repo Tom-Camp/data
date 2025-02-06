@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import List
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -15,6 +16,15 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.hash_algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+def role_checker(allowed_roles: List[str]):
+    async def check_role(user: User = Depends(get_current_user)):
+        if user.role not in allowed_roles:
+            raise HTTPException(status_code=403, detail="Insufficient permissions")
+        return user
+
+    return check_role
 
 
 async def authenticate_user(username: str, password: str):
