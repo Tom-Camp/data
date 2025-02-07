@@ -1,4 +1,5 @@
 import secrets
+from typing import Any, Dict
 
 from beanie import Document, PydanticObjectId
 from pydantic import BaseModel, Field
@@ -16,3 +17,9 @@ class Device(Document):
 class DeviceCreate(BaseModel):
     device_id: str
     api_key: str
+
+
+class DeviceData(Document):
+    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
+    device_id: str
+    data: Dict[str, Any]
