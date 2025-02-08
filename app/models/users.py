@@ -1,31 +1,32 @@
 from enum import Enum
+from typing import Annotated
 
-from beanie import Document, PydanticObjectId
-from pydantic import BaseModel, EmailStr, Field
+from beanie import Document, Indexed, PydanticObjectId
+from pydantic import EmailStr, Field
 
 
 class Role(Enum):
     ADMIN = 3
-    EDITOR = (2,)
+    EDITOR = 2
     AUTHENTICATED = 1
 
 
-class User(Document):
+class UserCreate(Document):
     id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
     username: str
-    email: str
-    hashed_password: str
-    role: Role
+    email: Annotated[EmailStr, Indexed(unique=True)]
+    password: str
+    role: Role = Role.AUTHENTICATED
 
     class Settings:
         name = "users"
 
 
-class UserCreate(BaseModel):
+class User(Document):
+    id: PydanticObjectId
     username: str
-    email: EmailStr
-    password: str
+    email: Annotated[EmailStr, Indexed(unique=True)]
+    role: Role
 
-
-class UserList(BaseModel):
-    username: str
+    class Settings:
+        name = "users"

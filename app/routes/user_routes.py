@@ -1,3 +1,4 @@
+from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -8,12 +9,12 @@ from app.auth import (
     pwd_context,
     role_checker,
 )
-from app.models.users import User, UserCreate, UserList
+from app.models.users import User, UserCreate
 
 router = APIRouter()
 
 
-@router.post("/users", response_model=User)
+@router.post("/users", response_model=UserCreate)
 async def create_user(
     new_user: UserCreate, user: User = Depends(role_checker(["admin"]))
 ):
@@ -27,10 +28,10 @@ async def create_user(
 
     hashed_password = pwd_context.hash(new_user.password)
 
-    new_user = User(
+    new_user = UserCreate(
         username=new_user.username,
         email=new_user.email,
-        hashed_password=hashed_password,
+        password=hashed_password,
         role=new_user.role,
     )
 
@@ -45,7 +46,22 @@ async def get_user(user_id: str):
     return user
 
 
-@router.get("/users", response_model=list[UserList])
+@router.put("/users/{user_id}")
+async def update_user(user_id: PydanticObjectId, user: UserCreate):
+    existing_user = await User.get(user_id)
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    update_data = user.model_dump(exclude_unset=True)
+    update_data["password"] = pwd_context.hash(user.password)
+
+    update_query = {"$set": update_data}
+
+    await existing_user.update(update_query)
+    return await User.get(user_id)
+
+
+@router.get("/users", response_model=list[User])
 async def list_users():
     users = await User.find_all().to_list()
     return users
