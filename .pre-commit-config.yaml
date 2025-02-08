@@ -37,7 +37,9 @@ repos:
       exclude: |
         (?x)^(
             .*/.*_test\.py|
-            .*/.*test_.*\.py
+            .*/.*test_.*\.py|
+            .*/.*test\.py|
+            .*/*/.*test_.*\.py
         )$
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.5.27
