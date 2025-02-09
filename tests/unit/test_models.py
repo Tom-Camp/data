@@ -3,13 +3,13 @@ from beanie import PydanticObjectId
 
 from app.models.devices import Device, DeviceCreate, DeviceData
 from app.models.journals import Entry, Journal
-from app.models.users import User, UserCreate
+from app.models.users import User
 
 
 class TestUserModel:
     @pytest.mark.asyncio
-    async def test_user_creation(beanie_init):
-        user = UserCreate(
+    async def test_user_creation(self, beanie_init):
+        user = User(
             username="test_user",
             email="test@example.com",
             password="p4ssword!23",
@@ -20,16 +20,17 @@ class TestUserModel:
         assert user.email == "test@example.com"
 
     @pytest.mark.asyncio
-    async def test_user_retrieval(beanie_init, create_test_users):
+    async def test_user_retrieval(self, beanie_init, create_test_users):
         user = await User.find_one(User.username == "admin_user")
+        user_dict = user.model_dump(exclude={"password"})
 
         assert user is not None
         assert user.username == "admin_user"
         assert user.role.value == 3
-        assert not hasattr(user, "password")
+        assert not hasattr(user_dict, "password")
 
     @pytest.mark.asyncio
-    async def test_user_update(beanie_init, create_test_users):
+    async def test_user_update(self, beanie_init, create_test_users):
         user = await User.find_one(User.username == "auth_user")
         new_email = "authenticated@example.com"
         user.email = new_email
@@ -39,7 +40,7 @@ class TestUserModel:
         assert updated_user.email == new_email
 
     @pytest.mark.asyncio
-    async def test_user_delete(beanie_init):
+    async def test_user_delete(self, beanie_init):
         user = await User.find_one(User.username == "test_user")
         await user.delete()
 
@@ -49,7 +50,7 @@ class TestUserModel:
 
 class TestJournalModel:
     @pytest.mark.asyncio
-    async def test_journal_creation(beanie_init):
+    async def test_journal_creation(self, beanie_init):
         author = await User.find_one(User.username == "editor_user")
         journal = Journal(
             title="Test Journal",
@@ -77,7 +78,7 @@ class TestJournalModel:
         assert len(journal.entries) == 2
 
     @pytest.mark.asyncio
-    async def test_journal_retrieval(beanie_init):
+    async def test_journal_retrieval(self, beanie_init):
         journal = await Journal.find_one(
             Journal.title == "Test Journal", fetch_links=True
         )
@@ -86,7 +87,7 @@ class TestJournalModel:
         assert author.username == "editor_user"
 
     @pytest.mark.asyncio
-    async def test_journal_update(beanie_init):
+    async def test_journal_update(self, beanie_init):
         journal = await Journal.find_one(
             Journal.title == "Test Journal", fetch_links=True
         )
@@ -107,7 +108,7 @@ class TestJournalModel:
         assert len(updated_journal.entries) == 3
 
     @pytest.mark.asyncio
-    async def test_journal_delete(beanie_init):
+    async def test_journal_delete(self, beanie_init):
         journal = await Journal.find_one(Journal.title == "Updated Test Journal")
         await journal.delete()
 
@@ -119,7 +120,7 @@ class TestJournalModel:
 
 class TestDeviceModel:
     @pytest.mark.asyncio
-    async def test_device_creation(beanie_init):
+    async def test_device_creation(self, beanie_init):
         device = DeviceCreate(
             device_id="test_device",
             data=[
@@ -142,14 +143,14 @@ class TestDeviceModel:
         assert len(device.data) == 2
 
     @pytest.mark.asyncio
-    async def test_journal_retrieval(beanie_init):
+    async def test_journal_retrieval(self, beanie_init):
         device = await Device.find_one(
             Device.device_id == "test_device", fetch_links=True
         )
         assert device is not None
 
     @pytest.mark.asyncio
-    async def test_journal_update(beanie_init):
+    async def test_journal_update(self, beanie_init):
         device = await Device.find_one(
             Device.device_id == "test_device", fetch_links=True
         )
@@ -166,7 +167,7 @@ class TestDeviceModel:
         assert len(updated_device.data) == 3
 
     @pytest.mark.asyncio
-    async def test_device_delete(beanie_init):
+    async def test_device_delete(self, beanie_init):
         device = await Device.find_one(Device.device_id == "test_device")
         await device.delete()
 

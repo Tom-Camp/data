@@ -9,7 +9,7 @@ from app.auth import (
     pwd_context,
     role_checker,
 )
-from app.models.users import User, UserCreate
+from app.models.users import User, UserCreate, UserShow
 
 router = APIRouter()
 
@@ -40,13 +40,13 @@ async def create_user(
     return new_user
 
 
-@router.get("/users/{user_id}")
+@router.get("/users/{user_id}", response_model=UserShow)
 async def get_user(user_id: str):
     user = await User.get(user_id)
     return user
 
 
-@router.put("/users/{user_id}")
+@router.put("/users/{user_id}", response_model=UserShow)
 async def update_user(user_id: PydanticObjectId, user: UserCreate):
     existing_user = await User.get(user_id)
     if not existing_user:
@@ -61,7 +61,7 @@ async def update_user(user_id: PydanticObjectId, user: UserCreate):
     return await User.get(user_id)
 
 
-@router.get("/users", response_model=list[User])
+@router.get("/users", response_model=list[UserShow])
 async def list_users():
     users = await User.find_all().to_list()
     return users
@@ -72,7 +72,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-    access_token = create_access_token(data={"sub": user.username})  # type: ignore[attr-defined]
+    access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
 

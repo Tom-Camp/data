@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.auth import pwd_context
 from app.config import settings
-from app.models.devices import Device
+from app.models.devices import Device, DeviceCreate
 from app.models.journals import Journal
 from app.models.users import Role, User
 from app.routes import device_routes, journal_routes, user_routes
@@ -16,7 +16,7 @@ async def init_db():
     client = AsyncIOMotorClient(settings.mongodb_uri)
     await init_beanie(
         database=client[settings.mongo_db],
-        document_models=[User, Journal, Device],
+        document_models=[User, Journal, Device, DeviceCreate],
     )
     return client
 
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
             new_user = User(
                 username=settings.initial_user_name,
                 email=settings.initial_user_mail,
-                hashed_password=hashed_password,
+                password=hashed_password,
                 role=Role.ADMIN,
             )
             await new_user.insert()
