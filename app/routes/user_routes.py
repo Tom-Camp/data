@@ -2,21 +2,15 @@ from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.auth import (
-    authenticate_user,
-    create_access_token,
-    get_current_user,
-    pwd_context,
-    role_checker,
-)
-from app.models.users import User, UserCreate, UserShow
+from app.auth import authenticate_user, create_access_token, pwd_context, require_role
+from app.models.users import Role, User, UserCreate, UserShow
 
 router = APIRouter()
 
 
-@router.post("/users", response_model=UserCreate)
+@router.post("/users", response_model=UserShow)
 async def create_user(
-    new_user: UserCreate, user: User = Depends(role_checker(["admin"]))
+    new_user: UserCreate, user: User = Depends(require_role(Role.ADMIN))
 ):
     existing_user = await User.find_one(User.username == new_user.username)
     if existing_user:
@@ -27,21 +21,19 @@ async def create_user(
         raise HTTPException(status_code=400, detail="Email already registered")
 
     hashed_password = pwd_context.hash(new_user.password)
-
-    new_user = UserCreate(
+    user = User(
         username=new_user.username,
         email=new_user.email,
         password=hashed_password,
         role=new_user.role,
     )
+    await user.insert()
 
-    await new_user.insert()
-
-    return new_user
+    return user
 
 
 @router.get("/users/{user_id}", response_model=UserShow)
-async def get_user(user_id: str):
+async def get_user(user_id: PydanticObjectId):
     user = await User.get(user_id)
     return user
 
@@ -76,6 +68,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_user)):
+@router.get("/current/user", response_model=UserShow)
+async def read_users_me(current_user: User = Depends(require_role(Role.AUTHENTICATED))):
     return current_user

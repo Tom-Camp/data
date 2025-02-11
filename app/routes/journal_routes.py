@@ -4,16 +4,16 @@ from _zoneinfo import ZoneInfo
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.auth import role_checker
+from app.auth import require_role
 from app.models.journals import Entry, Journal
-from app.models.users import User
+from app.models.users import Role, User
 
 router = APIRouter()
 
 
 @router.post("/journals", response_model=Journal)
 async def create_journal(
-    journal: Journal, user: User = Depends(role_checker(["ADMIN", "EDITOR"]))
+    journal: Journal, user: User = Depends(require_role(Role.ADMIN))
 ):
     await journal.insert()
     return journal
@@ -35,7 +35,7 @@ async def get_user(journal_id: str):
 async def update_journal(
     journal_id: PydanticObjectId,
     journal_update: Journal,
-    user: User = Depends(role_checker(["ADMIN", "EDITOR"])),
+    user: User = Depends(require_role(Role.ADMIN)),
 ):
     existing_journal = await Journal.get(journal_id)
     if not existing_journal:

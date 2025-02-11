@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
 
 from beanie import init_beanie
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.auth import pwd_context
@@ -60,3 +62,13 @@ app = FastAPI(
 app.include_router(device_routes.router, prefix="/api")
 app.include_router(journal_routes.router, prefix="/api")
 app.include_router(user_routes.router, prefix="/api")
+
+
+@app.exception_handler(RequestValidationError)
+async def custom_422_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Invalid request data",
+        },
+    )
