@@ -38,14 +38,30 @@ async def get_user(user_id: PydanticObjectId):
     return user
 
 
-@router.put("/users/{user_id}", response_model=UserShow)
-async def update_user(user_id: PydanticObjectId, user: UserCreate):
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: PydanticObjectId, user: User = Depends(require_role(Role.ADMIN))
+):
     existing_user = await User.get(user_id)
     if not existing_user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    update_data = user.model_dump(exclude_unset=True)
-    update_data["password"] = pwd_context.hash(user.password)
+    await existing_user.delete()
+    return {"message": "User deleted successfully"}
+
+
+@router.put("/users/{user_id}", response_model=UserShow)
+async def update_user(
+    user_id: PydanticObjectId,
+    updated_user: UserCreate,
+    user: User = Depends(require_role(Role.ADMIN)),
+):
+    existing_user = await User.get(user_id)
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    update_data = updated_user.model_dump(exclude_unset=True)
+    update_data["password"] = pwd_context.hash(updated_user.password)
 
     update_query = {"$set": update_data}
 
