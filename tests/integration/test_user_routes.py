@@ -120,139 +120,126 @@ class TestUserRoutes:
         assert response.json()["username"] == "admin_user"
 
     @pytest.mark.asyncio
-    async def test_editor_login_token(self, create_test_users, async_client):
-        user_data = {
-            "username": "editor_user",
-            "password": "password123",
-        }
-        response = await async_client.post(
-            "/api/token",
-            data=user_data,
-        )
-        assert response.status_code == 200
-        assert "access_token" in response.json()
-        assert "token_type" in response.json()
-        self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+    async def test_nonadmin_login_token(self, create_test_users, async_client):
+        for user in ["editor_user", "auth_user"]:
+            user_data = {
+                "username": user,
+                "password": "password123",
+            }
+            response = await async_client.post(
+                "/api/token",
+                data=user_data,
+            )
+            assert response.status_code == 200
+            assert "access_token" in response.json()
+            assert "token_type" in response.json()
 
     @pytest.mark.asyncio
-    async def test_editor_create_user(self, create_test_users, async_client):
-        user_data = {
-            "username": "test_user_3",
-            "password": "password123",
-            "email": "test_user_3@example.com",
-        }
-        response = await async_client.post(
-            "/api/users",
-            headers=self.header,
-            json=user_data,
-        )
-        assert response.status_code == 403
+    async def test_nonadmin_create_user(self, create_test_users, async_client):
+        for user in ["editor_user", "auth_user"]:
+            user_data = {
+                "username": user,
+                "password": "password123",
+            }
+            response = await async_client.post(
+                "/api/token",
+                data=user_data,
+            )
+            self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+            user_data = {
+                "username": "test_user_3",
+                "password": "password123",
+                "email": "test_user_3@example.com",
+            }
+            response = await async_client.post(
+                "/api/users",
+                headers=self.header,
+                json=user_data,
+            )
+            assert response.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_editor_get_user(self, create_test_users, async_client):
-        user = await User.find_one(User.username == "auth_user")
-        response = await async_client.get(
-            f"/api/users/{user.id}",
-            headers=self.header,
-        )
-        assert response.status_code == 200
-        assert response.json()["username"] == "auth_user"
+    async def test_nonadmin_get_user(self, create_test_users, async_client):
+        for user in ["editor_user", "auth_user"]:
+            user_data = {
+                "username": user,
+                "password": "password123",
+            }
+            response = await async_client.post(
+                "/api/token",
+                data=user_data,
+            )
+            self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+            user = await User.find_one(User.username == "admin_user")
+            response = await async_client.get(
+                f"/api/users/{user.id}",
+                headers=self.header,
+            )
+            assert response.status_code == 200
+            assert response.json()["username"] == "admin_user"
 
     @pytest.mark.asyncio
-    async def test_editor_update_user(self, create_test_users, async_client):
-        user = await User.find_one(User.username == "auth_user")
-        user_data = {
-            "username": "auth_user_updated",
-            "email": user.email,
-            "password": user.password,
-        }
-        response = await async_client.put(
-            f"/api/users/{user.id}",
-            headers=self.header,
-            json=user_data,
-        )
-        assert response.status_code == 403
+    async def test_nonadmin_update_user(self, create_test_users, async_client):
+        for user in ["editor_user", "auth_user"]:
+            user_data = {
+                "username": user,
+                "password": "password123",
+            }
+            response = await async_client.post(
+                "/api/token",
+                data=user_data,
+            )
+            self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+            user = await User.find_one(User.username == "admin_user")
+            user_data = {
+                "username": "admin_user_updated",
+                "email": user.email,
+                "password": user.password,
+            }
+            response = await async_client.put(
+                f"/api/users/{user.id}",
+                headers=self.header,
+                json=user_data,
+            )
+            assert response.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_editor_delete_user(self, create_test_users, async_client):
-        user = await User.find_one(User.username == "auth_user")
-        response = await async_client.delete(
-            f"/api/users/{user.id}",
-            headers=self.header,
-        )
-        assert response.status_code == 403
+    async def test_nonadmin_delete_user(self, create_test_users, async_client):
+        for user in ["editor_user", "auth_user"]:
+            user_data = {
+                "username": user,
+                "password": "password123",
+            }
+            response = await async_client.post(
+                "/api/token",
+                data=user_data,
+            )
+            self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+            user = await User.find_one(User.username == "admin_user")
+            response = await async_client.delete(
+                f"/api/users/{user.id}",
+                headers=self.header,
+            )
+            assert response.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_auth_login_token(self, create_test_users, async_client):
-        user_data = {
-            "username": "auth_user",
-            "password": "password123",
-        }
-        response = await async_client.post(
-            "/api/token",
-            data=user_data,
-        )
-        assert response.status_code == 200
-        assert "access_token" in response.json()
-        assert "token_type" in response.json()
-        self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
-
-    @pytest.mark.asyncio
-    async def test_auth_create_user(self, create_test_users, async_client):
-        user_data = {
-            "username": "test_user_3",
-            "password": "password123",
-            "email": "test_user_3@example.com",
-        }
-        response = await async_client.post(
-            "/api/users",
-            headers=self.header,
-            json=user_data,
-        )
-        assert response.status_code == 403
-
-    @pytest.mark.asyncio
-    async def test_auth_get_user(self, create_test_users, async_client):
-        user = await User.find_one(User.username == "editor_user")
-        response = await async_client.get(
-            f"/api/users/{user.id}",
-            headers=self.header,
-        )
-        assert response.status_code == 200
-        assert response.json()["username"] == "editor_user"
-
-    @pytest.mark.asyncio
-    async def test_auth_update_user(self, create_test_users, async_client):
-        user = await User.find_one(User.username == "admin_user")
-        user_data = {
-            "username": "admin_user_updated",
-            "email": user.email,
-            "password": user.password,
-        }
-        response = await async_client.put(
-            f"/api/users/{user.id}",
-            headers=self.header,
-            json=user_data,
-        )
-        assert response.status_code == 403
-
-    @pytest.mark.asyncio
-    async def test_auth_delete_user(self, create_test_users, async_client):
-        user = await User.find_one(User.username == "editor_user")
-        response = await async_client.delete(
-            f"/api/users/{user.id}",
-            headers=self.header,
-        )
-        assert response.status_code == 403
-
-    @pytest.mark.asyncio
-    async def test_auth_get_current_user(self, async_client):
-        response = await async_client.get(
-            "/api/current/user",
-            headers=self.header,
-        )
-        assert response.status_code == 200
-        assert response.json()["username"] == "auth_user"
+    async def test_nonadmin_get_current_user(self, async_client):
+        for user in ["editor_user", "auth_user"]:
+            user_data = {
+                "username": user,
+                "password": "password123",
+            }
+            response = await async_client.post(
+                "/api/token",
+                data=user_data,
+            )
+            self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+            response = await async_client.get(
+                "/api/current/user",
+                headers=self.header,
+            )
+            assert response.status_code == 200
+            assert response.json()["username"] == user
 
     @pytest.mark.asyncio
     async def test_get_user_list(self, create_test_users, async_client):

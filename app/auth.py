@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.config import settings
+from app.models.devices import Device
 from app.models.users import Role, User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -15,6 +16,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.hash_algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+API_KEY_HEADER = APIKeyHeader(name="X-API-Key")
 
 
 async def authenticate_user(username: str, password: str):
@@ -24,6 +26,13 @@ async def authenticate_user(username: str, password: str):
     if not pwd_context.verify(password, user.password):
         return False
     return user
+
+
+async def validate_api_key(api_key: str = Depends(API_KEY_HEADER)) -> Device:
+    device = await Device.find_one({"api_key": api_key})
+    if device is None:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    return device
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:

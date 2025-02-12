@@ -1,9 +1,8 @@
 from datetime import datetime
 from enum import Enum
 from typing import Annotated
-from zoneinfo import ZoneInfo
 
-from beanie import Document, Indexed, Insert, PydanticObjectId, before_event
+from beanie import Document, Indexed, Insert, PydanticObjectId, Update, before_event
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -24,8 +23,12 @@ class User(Document):
 
     @before_event(Insert)
     def set_times(self):
-        self.created_date = datetime.now(ZoneInfo("America/New_York"))
-        self.updated_date = datetime.now(ZoneInfo("America/New_York"))
+        self.created_date = datetime.now()
+        self.updated_date = datetime.now()
+
+    @before_event(Update)
+    def update_time(self):
+        self.updated_date = datetime.now()
 
     class Settings:
         name = "users"

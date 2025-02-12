@@ -9,7 +9,7 @@ from mongomock_motor import AsyncMongoMockClient
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.auth import pwd_context  # noqa: E402
 from app.main import app  # noqa: E402
-from app.models.devices import Device, DeviceCreate  # noqa: E402
+from app.models.devices import Device  # noqa: E402
 from app.models.journals import Journal  # noqa: E402
 from app.models.users import Role, User  # noqa: E402
 
@@ -19,7 +19,7 @@ async def beanie_init():
     client = AsyncMongoMockClient()
     await init_beanie(
         database=client["testdb"],
-        document_models=[User, Journal, Device, DeviceCreate],
+        document_models=[User, Journal, Device],
     )
     return client
 

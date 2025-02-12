@@ -1,6 +1,6 @@
 import pytest
 
-from app.models.devices import Device, DeviceCreate, DeviceData
+from app.models.devices import Device, DeviceData
 from app.models.journals import Entry, Journal
 from app.models.users import User
 
@@ -102,7 +102,7 @@ class TestJournalModel:
 class TestDeviceModel:
     @pytest.mark.asyncio
     async def test_device_creation(self, beanie_init):
-        device = DeviceCreate(
+        device = Device(
             device_id="test_device",
             data=[
                 DeviceData(
