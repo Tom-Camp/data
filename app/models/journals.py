@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List
-from zoneinfo import ZoneInfo
 
 from beanie import (
     Document,
@@ -43,9 +42,28 @@ class Journal(Document):
     entries: List[Entry]
 
     @before_event(Insert)
-    def set_times(self):
-        self.created_date = datetime.now(ZoneInfo("America/New_York"))
-        self.updated_date = datetime.now(ZoneInfo("America/New_York"))
+    async def set_times(self):
+        self.created_date = datetime.now()
+        self.updated_date = datetime.now()
+
+    @before_event(Update)
+    async def update_times(self):
+        self.updated_date = datetime.now()
 
     class Settings:
         name = "journals"
+
+
+class JournalCreate(BaseModel):
+    title: str
+    created_date: datetime | None = None
+    updated_date: datetime | None = None
+    author: Link[User]
+    description: str
+    entries: List[Entry]
+
+
+class JournalUpdate(BaseModel):
+    title: str
+    description: str
+    entries: List[Entry]

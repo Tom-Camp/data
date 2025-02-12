@@ -1,5 +1,4 @@
 import pytest
-from beanie import PydanticObjectId
 
 from app.models.devices import Device, DeviceCreate, DeviceData
 from app.models.journals import Entry, Journal
@@ -50,29 +49,11 @@ class TestUserModel:
 
 class TestJournalModel:
     @pytest.mark.asyncio
-    async def test_journal_creation(self, beanie_init):
+    async def test_journal_creation(self, beanie_init, journal_data):
         author = await User.find_one(User.username == "editor_user")
-        journal = Journal(
-            title="Test Journal",
-            author=PydanticObjectId(author.id),
-            description="This is a test journal.",
-            entries=[
-                Entry(
-                    title="Test Entry",
-                    date="2022-01-01 12:00:00",
-                    location="POINT (-81.0295357 34.927908)",
-                    body="This is a test entry.",
-                    images=["/path/to/image.jpg"],
-                ),
-                Entry(
-                    title="Another Entry",
-                    date="2022-01-02 12:00:00",
-                    location="POINT (-81.0295357 34.927908)",
-                    body="This is another test entry.",
-                    images=["/path/to/image.jpg"],
-                ),
-            ],
-        )
+        journal_data = journal_data
+        journal_data["author"] = author
+        journal = Journal(**journal_data)
         await journal.insert()
         assert journal.title == "Test Journal"
         assert len(journal.entries) == 2
@@ -143,14 +124,14 @@ class TestDeviceModel:
         assert len(device.data) == 2
 
     @pytest.mark.asyncio
-    async def test_journal_retrieval(self, beanie_init):
+    async def test_device_retrieval(self, beanie_init):
         device = await Device.find_one(
             Device.device_id == "test_device", fetch_links=True
         )
         assert device is not None
 
     @pytest.mark.asyncio
-    async def test_journal_update(self, beanie_init):
+    async def test_device_update(self, beanie_init):
         device = await Device.find_one(
             Device.device_id == "test_device", fetch_links=True
         )
@@ -171,5 +152,5 @@ class TestDeviceModel:
         device = await Device.find_one(Device.device_id == "test_device")
         await device.delete()
 
-        deleted_device = await Journal.find_one(Device.device_id == "test_device")
+        deleted_device = await Device.find_one(Device.device_id == "test_device")
         assert deleted_device is None

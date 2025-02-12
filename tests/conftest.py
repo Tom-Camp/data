@@ -51,3 +51,32 @@ async def create_test_users(beanie_init):
             )
         )
     await User.insert_many(user_list)
+
+
+@pytest_asyncio.fixture(loop_scope="session", scope="session")
+async def journal_data():
+    journal_data = {
+        "title": "Test Journal",
+        "description": "This is a test journal",
+        "entries": [
+            {
+                "title": "Entry 1",
+                "date": "2021-09-01",
+                "body": "This is the first entry in the test journal",
+                "location": "POINT (-81.0295357 34.927908)",
+                "images": [
+                    "/path/to/image.jpg",
+                ],
+            },
+            {
+                "title": "Entry 2",
+                "date": "2021-09-01",
+                "body": "This is the second entry in the test journal",
+                "location": "POINT (-81.0295357 34.927908)",
+                "images": [
+                    "/path/to/another/image.jpg",
+                ],
+            },
+        ],
+    }
+    return journal_data
