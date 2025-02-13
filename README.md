@@ -1,20 +1,20 @@
 # Tom.Camp Data
 
-A modern FastAPI application using MongoDB with Beanie ODM, UV for dependency management, and comprehensive testing
-setup. The application is configured to run with the application and the database running in Docker containers
-using docker-compose.
+A modern FastAPI application using MongoDB with Beanie ODM, and UV for dependency management. The
+application is configured to run with the application and the database running in Docker
+containers using docker-compose.
 
-The site is configured to ingest and serve data from different sources, using both API key and username and
-password authentication.
+The site is configured to ingest and serve data from different sources, using both API key and
+username and password authentication.
 
 ## Features
 
-* FastAPI for building high-performance APIs
-* MongoDB integration using Beanie ODM
+* [FastAPI](https://fastapi.tiangolo.com/) for building high-performance APIs
+* [MongoDB](https://www.mongodb.com/) integration using Beanie ODM
 * Async database operations
 * Comprehensive test suite with pytest
-* Code quality tools with pre-commit hooks
-* Dependency management with UV
+* Code quality tools with [pre-commit](https://pre-commit.com/) hooks
+* Dependency management with [UV](https://docs.astral.sh/uv/)
 
 ## Prerequisites
 

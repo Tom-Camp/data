@@ -32,14 +32,10 @@ repos:
     rev: 1.7.10
     hooks:
     - id: bandit
-      args: [ "--skip", "B101" ]
-      exclude: |
-        (?x)^(
-            .*/.*_test\.py|
-            .*/.*test_.*\.py|
-            .*/.*test\.py|
-            .*/*/.*test_.*\.py
-        )$
+      skips:
+        - B101
+      exclude_dirs:
+        - tests
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.5.27
     hooks:
