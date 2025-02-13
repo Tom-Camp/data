@@ -10,7 +10,7 @@ class TestUserRoutes:
     async def test_admin_login_token(self, create_test_users, async_client):
         user_data = {
             "username": "admin_user",
-            "password": "password123",
+            "password": "Password!23",
         }
         response = await async_client.post(
             "/api/token",
@@ -25,7 +25,7 @@ class TestUserRoutes:
     async def test_admin_create_user(self, create_test_users, async_client):
         user_data = {
             "username": "test_user_1",
-            "password": "password123",
+            "password": "Password!23",
             "email": "test_user_1@example.com",
         }
         response = await async_client.post(
@@ -40,7 +40,7 @@ class TestUserRoutes:
     async def test_admin_create_existing_user(self, create_test_users, async_client):
         user_data = {
             "username": "test_user_1",
-            "password": "password123",
+            "password": "Password!23",
             "email": "test_user_1@example.com",
         }
         response = await async_client.post(
@@ -55,7 +55,7 @@ class TestUserRoutes:
     async def test_admin_create_existing_email(self, create_test_users, async_client):
         user_data = {
             "username": "test_user_2",
-            "password": "password123",
+            "password": "Password!23",
             "email": "test_user_1@example.com",
         }
         response = await async_client.post(
@@ -124,7 +124,7 @@ class TestUserRoutes:
         for user in ["editor_user", "auth_user"]:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",
@@ -139,7 +139,7 @@ class TestUserRoutes:
         for user in ["editor_user", "auth_user"]:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",
@@ -148,7 +148,7 @@ class TestUserRoutes:
             self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
             user_data = {
                 "username": "test_user_3",
-                "password": "password123",
+                "password": "Password!23",
                 "email": "test_user_3@example.com",
             }
             response = await async_client.post(
@@ -163,7 +163,7 @@ class TestUserRoutes:
         for user in ["editor_user", "auth_user"]:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",
@@ -183,7 +183,7 @@ class TestUserRoutes:
         for user in ["editor_user", "auth_user"]:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",
@@ -208,7 +208,7 @@ class TestUserRoutes:
         for user in ["editor_user", "auth_user"]:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",
@@ -227,7 +227,7 @@ class TestUserRoutes:
         for user in ["editor_user", "auth_user"]:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",

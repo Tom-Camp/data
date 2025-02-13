@@ -1,11 +1,17 @@
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from password_validator import PasswordValidator
 
 from app.auth import authenticate_user, create_access_token, pwd_context, require_role
 from app.models.users import Role, User, UserCreate, UserShow
 
 router = APIRouter()
+
+schema = PasswordValidator()
+schema.min(10).max(
+    100
+).has().uppercase().has().lowercase().has().digits().has().symbols()
 
 
 @router.post("/users", response_model=UserShow)
@@ -19,6 +25,9 @@ async def create_user(
     existing_email = await User.find_one(User.email == new_user.email)
     if existing_email:
         raise HTTPException(status_code=400, detail="Email already registered")
+
+    if not schema.validate(new_user.password):
+        raise HTTPException(status_code=400, detail="Password not strong enough")
 
     hashed_password = pwd_context.hash(new_user.password)
     user = User(

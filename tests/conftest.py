@@ -34,7 +34,7 @@ async def async_client(beanie_init):
 
 @pytest_asyncio.fixture(loop_scope="session", scope="session")
 async def create_test_users(beanie_init):
-    hashed_password = pwd_context.hash("password123")
+    hashed_password = pwd_context.hash("Password!23")
     user_list: list[User] = []
     users: dict = {
         "admin": Role.ADMIN,

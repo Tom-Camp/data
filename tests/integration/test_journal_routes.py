@@ -13,7 +13,7 @@ class TestJournalRoutes:
     ):
         user_data = {
             "username": "editor_user",
-            "password": "password123",
+            "password": "Password!23",
         }
         response = await async_client.post(
             "/api/token",
@@ -86,7 +86,7 @@ class TestJournalRoutes:
     async def test_admin_delete_journal(self, create_test_users, async_client):
         user_data = {
             "username": "admin_user",
-            "password": "password123",
+            "password": "Password!23",
         }
         response = await async_client.post(
             "/api/token",
@@ -170,7 +170,7 @@ class TestJournalRoutes:
     ):
         user_data = {
             "username": "auth_user",
-            "password": "password123",
+            "password": "Password!23",
         }
         response = await async_client.post(
             "/api/token",
