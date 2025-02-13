@@ -252,3 +252,29 @@ class TestUserRoutes:
         assert response.json()[0]["username"] == "admin_user"
         assert response.json()[1]["username"] == "editor_user"
         assert response.json()[2]["username"] == "auth_user"
+
+    @pytest.mark.asyncio
+    async def test_unknown_user_login(self, create_test_users, async_client):
+        user_data = {
+            "username": "unknown_user",
+            "password": "Password!23",
+        }
+        response = await async_client.post(
+            "/api/token",
+            data=user_data,
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Incorrect username or password"
+
+    @pytest.mark.asyncio
+    async def test_invalid_password_login(self, create_test_users, async_client):
+        user_data = {
+            "username": "admin_user",
+            "password": "password",
+        }
+        response = await async_client.post(
+            "/api/token",
+            data=user_data,
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Incorrect username or password"

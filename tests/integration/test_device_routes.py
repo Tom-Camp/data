@@ -80,6 +80,15 @@ class TestDevices:
         assert response.json()["data"][0]["created_date"] is not None
 
     @pytest.mark.asyncio
+    async def test_get_unknown_device(self, async_client):
+        response = await async_client.get(
+            "/api/devices/123456789012345678901234",
+            headers=self.header,
+        )
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Device not found"}
+
+    @pytest.mark.asyncio
     async def test_device_list(self, async_client):
         response = await async_client.get("/api/devices")
         assert response.status_code == 200
@@ -152,3 +161,15 @@ class TestDevices:
         response = await async_client.get("/api/devices")
         assert response.status_code == 200
         assert len(response.json()) == 0
+
+    @pytest.mark.asyncio
+    async def test_invalid_api_key(self, async_client):
+        response = await async_client.post(
+            "/api/devices/data",
+            json={"device_id": "posted_device", "data": {"key": "value"}},
+            headers={
+                "Content-Type": "application/json",
+                "X-API-KEY": "invalid_api_key",
+            },
+        )
+        assert response.status_code == 401

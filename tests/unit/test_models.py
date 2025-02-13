@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 
 from app.models.devices import Device, DeviceData
@@ -122,6 +124,8 @@ class TestDeviceModel:
         await device.insert()
         assert isinstance(device.api_key, str)
         assert len(device.data) == 2
+        assert device.data[0].data == {"test": "data", "list": [1, 2, 3]}
+        assert isinstance(device.data[0].created_date, datetime)
 
     @pytest.mark.asyncio
     async def test_device_retrieval(self, beanie_init):
@@ -154,3 +158,14 @@ class TestDeviceModel:
 
         deleted_device = await Device.find_one(Device.device_id == "test_device")
         assert deleted_device is None
+
+    @pytest.mark.asyncio
+    async def test_device_data_creation(self, beanie_init):
+        device_data = DeviceData(
+            data={
+                "test": "data",
+                "list": [1, 2, 3],
+            }
+        )
+        assert device_data.data == {"test": "data", "list": [1, 2, 3]}
+        assert isinstance(device_data.created_date, datetime)
