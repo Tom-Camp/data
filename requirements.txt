@@ -241,6 +241,9 @@ packaging==24.2 \
 passlib==1.7.4 \
     --hash=sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1 \
     --hash=sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04
+password-validator==1.0 \
+    --hash=sha256:4de1758e15b4e9bdf32933fcc99ce89efcdd28566e26e130726bb4295dd0d44c \
+    --hash=sha256:f12c1036b17c67fab607ad8003f43e73940793d7ab89bc7efcb2cd47c024533b
 pluggy==1.5.0 \
     --hash=sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1 \
     --hash=sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669

@@ -12,7 +12,7 @@ class TestDevices:
     async def test_device_create(self, async_client, create_test_users):
         user_data = {
             "username": "admin_user",
-            "password": "password123",
+            "password": "Password!23",
         }
         response = await async_client.post(
             "/api/token",
@@ -56,7 +56,7 @@ class TestDevices:
     async def test_device_get(self, async_client):
         user_data = {
             "username": "admin_user",
-            "password": "password123",
+            "password": "Password!23",
         }
         response = await async_client.post(
             "/api/token",
@@ -98,7 +98,7 @@ class TestDevices:
         for user in test_users:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",
@@ -119,7 +119,7 @@ class TestDevices:
         for user in test_users:
             user_data = {
                 "username": user,
-                "password": "password123",
+                "password": "Password!23",
             }
             response = await async_client.post(
                 "/api/token",
@@ -136,7 +136,7 @@ class TestDevices:
     async def test_device_delete(self, async_client, create_test_users):
         user_data = {
             "username": "admin_user",
-            "password": "password123",
+            "password": "Password!23",
         }
         response = await async_client.post(
             "/api/token",
