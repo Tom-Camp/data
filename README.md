@@ -98,6 +98,7 @@ uv run pytest --cov=app tests/
 ## Pre-commit Hooks
 
 * trailing-whitespace
+* check-yaml
 * end-of-file-fixer
 * [isort](https://github.com/pycqa/isort)
 * [flake8](https://github.com/PyCQA/flake8)
