@@ -15,7 +15,7 @@ jobs:
       HASH_ALGORITHM: HS256
       INITIAL_USER_NAME: test_user
       INITIAL_USER_MAIL: test@example.com
-      INITIAL_USER_PASS: test_password
+      INITIAL_USER_PASS: Password!23
     strategy:
       matrix:
         python-version: ["3.11"]
