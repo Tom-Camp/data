@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from beanie import init_beanie
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.auth import pwd_context
@@ -62,6 +62,11 @@ app = FastAPI(
 app.include_router(device_routes.router, prefix="/api")
 app.include_router(journal_routes.router, prefix="/api")
 app.include_router(user_routes.router, prefix="/api")
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse(url="/docs")
 
 
 @app.exception_handler(RequestValidationError)
