@@ -48,7 +48,6 @@ jobs:
           coverage_pct=$(grep "TOTAL" coverage.txt | awk '{print $NF}' | sed 's/%//')
           echo "COVERAGE=$coverage_pct" >> $GITHUB_ENV
 
-          # Create badge JSON files
           echo "{\"schemaVersion\": 1, \"label\": \"coverage\", \"message\": \"${coverage_pct}%\", \"color\": \"$(if [ ${coverage_pct%.*} -gt 80 ]; then echo 'success'; else echo 'critical'; fi)\"}" > coverage-badge.json
           echo "{\"schemaVersion\": 1, \"label\": \"tests\", \"message\": \"passing\", \"color\": \"success\"}" > tests-badge.json
 
