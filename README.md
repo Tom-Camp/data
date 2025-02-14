@@ -1,10 +1,11 @@
 # Tom.Camp Data
 
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
-[![coverage: pytest](https://img.shields.io/badge/coverage-pytest-green.svg)](https://docs.pytest.org/en/7.1.x/contents.html)
 [![fastapi: framework](https://img.shields.io/badge/fastapi-framework-blue.svg)](https://fastapi.tiangolo.com/)
 [![mongodb: database](https://img.shields.io/badge/mongodb-database-blue.svg)](https://www.mongodb.com/)
 [![beanie: odm](https://img.shields.io/badge/beanie-odm-blue.svg)](https://github.com/BeanieODM/beanie)
+[![Tests](https://github.com/Tom-Camp/repository/actions/workflows/tests.yml/badge.svg)](https://github.com/Tom-Camp/repository/actions/workflows/tests.yml)
+[![Coverage](https://codecov.io/gh/Tom-Camp/repository/branch/main/graph/badge.svg)](https://codecov.io/gh/Tom-Camp/repository)
 
 A modern FastAPI application using MongoDB with Beanie ODM, and UV for dependency management. The
 application is configured to run with the application and the database running in Docker
