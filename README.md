@@ -4,8 +4,8 @@
 [![fastapi: framework](https://img.shields.io/badge/fastapi-framework-blue.svg)](https://fastapi.tiangolo.com/)
 [![mongodb: database](https://img.shields.io/badge/mongodb-database-blue.svg)](https://www.mongodb.com/)
 [![beanie: odm](https://img.shields.io/badge/beanie-odm-blue.svg)](https://github.com/BeanieODM/beanie)
-[![Tests](https://github.com/Tom-Camp/repository/actions/workflows/tests.yml/badge.svg)](https://github.com/Tom-Camp/repository/actions/workflows/tests.yml)
-[![Coverage](https://codecov.io/gh/Tom-Camp/repository/branch/main/graph/badge.svg)](https://codecov.io/gh/Tom-Camp/repository)
+![Tests](https://raw.githubusercontent.com/Tom-Camp/repository/badges/tests-badge.json)
+![Coverage](https://raw.githubusercontent.com/Tom-Camp/repository/badges/coverage-badge.json)
 
 A modern FastAPI application using MongoDB with Beanie ODM, and UV for dependency management. The
 application is configured to run with the application and the database running in Docker
