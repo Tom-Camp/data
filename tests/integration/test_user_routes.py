@@ -1,4 +1,5 @@
 import pytest
+from beanie import PydanticObjectId
 
 from app.models.users import User
 
@@ -67,6 +68,21 @@ class TestUserRoutes:
         assert response.json()["detail"] == "Email already registered"
 
     @pytest.mark.asyncio
+    async def test_admin_create_weak_email(self, create_test_users, async_client):
+        user_data = {
+            "username": "test_user_2",
+            "password": "password123",
+            "email": "test_user_2@example.com",
+        }
+        response = await async_client.post(
+            "/api/users",
+            headers=self.header,
+            json=user_data,
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Password not strong enough"
+
+    @pytest.mark.asyncio
     async def test_admin_get_user(self, create_test_users, async_client):
         user = await User.find_one(User.username == "test_user_1")
         response = await async_client.get(
@@ -101,6 +117,22 @@ class TestUserRoutes:
         assert response.status_code == 200
 
     @pytest.mark.asyncio
+    async def test_admin_update_nonexistant_user(self, create_test_users, async_client):
+        pid = PydanticObjectId()
+        user_data = {
+            "username": "test_user_1_updated",
+            "email": "test_user@example.com",
+            "password": "Password!23",
+        }
+        response = await async_client.put(
+            f"/api/users/{str(pid)}",
+            headers=self.header,
+            json=user_data,
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "User not found"
+
+    @pytest.mark.asyncio
     async def test_admin_delete_user(self, create_test_users, async_client):
         user = await User.find_one(User.username == "test_user_1_updated")
         response = await async_client.delete(
@@ -109,6 +141,16 @@ class TestUserRoutes:
         )
         assert response.status_code == 200
         assert response.json()["message"] == "User deleted successfully"
+
+    @pytest.mark.asyncio
+    async def test_admin_delete_nonexistant_user(self, create_test_users, async_client):
+        pid = PydanticObjectId()
+        response = await async_client.delete(
+            f"/api/users/{str(pid)}",
+            headers=self.header,
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "User not found"
 
     @pytest.mark.asyncio
     async def test_admin_get_current_user(self, async_client):
@@ -278,3 +320,10 @@ class TestUserRoutes:
         )
         assert response.status_code == 400
         assert response.json()["detail"] == "Incorrect username or password"
+
+
+@pytest.mark.asyncio
+async def test_root_redirect(async_client):
+    response = await async_client.get("/")
+    assert response.status_code == 307
+    assert response.headers["location"] == "/docs"

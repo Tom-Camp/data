@@ -100,6 +100,41 @@ class TestJournalModel:
         )
         assert deleted_journal is None
 
+    @pytest.mark.asyncio
+    async def test_journal_entry_creation(self, beanie_init):
+        entry = Entry(
+            title="A New Entry",
+            date="2022-01-01 12:00:00",
+            location="POINT (-81.0295357 34.927908)",
+            body="This is a test entry.",
+            images=["/path/to/image.jpg"],
+        )
+        assert entry.title == "A New Entry"
+        assert entry.date == datetime(2022, 1, 1, 12)
+        assert entry.location == "POINT (-81.0295357 34.927908)"
+        assert entry.body == "This is a test entry."
+        assert entry.images == ["/path/to/image.jpg"]
+
+    @pytest.mark.asyncio
+    async def test_journal_entry_date_validation(self, beanie_init):
+        entry = Entry(
+            title="A New Entry",
+            date="",
+            location="POINT (-81.0295357 34.927908)",
+            body="This is a test entry.",
+            images=["/path/to/image.jpg"],
+        )
+        assert isinstance(entry.date, datetime)
+
+        entry = Entry(
+            title="A New Entry",
+            date="not-a-date",
+            location="POINT (-81.0295357 34.927908)",
+            body="This is a test entry.",
+            images=["/path/to/image.jpg"],
+        )
+        assert isinstance(entry.date, datetime)
+
 
 class TestDeviceModel:
     @pytest.mark.asyncio
