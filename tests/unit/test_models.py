@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 
 from app.models.devices import Device, DeviceData
@@ -98,6 +100,41 @@ class TestJournalModel:
         )
         assert deleted_journal is None
 
+    @pytest.mark.asyncio
+    async def test_journal_entry_creation(self, beanie_init):
+        entry = Entry(
+            title="A New Entry",
+            date="2022-01-01 12:00:00",
+            location="POINT (-81.0295357 34.927908)",
+            body="This is a test entry.",
+            images=["/path/to/image.jpg"],
+        )
+        assert entry.title == "A New Entry"
+        assert entry.date == datetime(2022, 1, 1, 12)
+        assert entry.location == "POINT (-81.0295357 34.927908)"
+        assert entry.body == "This is a test entry."
+        assert entry.images == ["/path/to/image.jpg"]
+
+    @pytest.mark.asyncio
+    async def test_journal_entry_date_validation(self, beanie_init):
+        entry = Entry(
+            title="A New Entry",
+            date="",
+            location="POINT (-81.0295357 34.927908)",
+            body="This is a test entry.",
+            images=["/path/to/image.jpg"],
+        )
+        assert isinstance(entry.date, datetime)
+
+        entry = Entry(
+            title="A New Entry",
+            date="not-a-date",
+            location="POINT (-81.0295357 34.927908)",
+            body="This is a test entry.",
+            images=["/path/to/image.jpg"],
+        )
+        assert isinstance(entry.date, datetime)
+
 
 class TestDeviceModel:
     @pytest.mark.asyncio
@@ -122,6 +159,8 @@ class TestDeviceModel:
         await device.insert()
         assert isinstance(device.api_key, str)
         assert len(device.data) == 2
+        assert device.data[0].data == {"test": "data", "list": [1, 2, 3]}
+        assert isinstance(device.data[0].created_date, datetime)
 
     @pytest.mark.asyncio
     async def test_device_retrieval(self, beanie_init):
@@ -154,3 +193,14 @@ class TestDeviceModel:
 
         deleted_device = await Device.find_one(Device.device_id == "test_device")
         assert deleted_device is None
+
+    @pytest.mark.asyncio
+    async def test_device_data_creation(self, beanie_init):
+        device_data = DeviceData(
+            data={
+                "test": "data",
+                "list": [1, 2, 3],
+            }
+        )
+        assert device_data.data == {"test": "data", "list": [1, 2, 3]}
+        assert isinstance(device_data.created_date, datetime)

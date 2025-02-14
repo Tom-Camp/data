@@ -1,4 +1,5 @@
 import pytest
+from beanie import PydanticObjectId
 
 from app.models.journals import Journal
 from app.models.users import User
@@ -46,6 +47,13 @@ class TestJournalRoutes:
         assert response.json()["description"] == "This is a test journal"
         assert author.username == "editor_user"
         assert len(response.json()["entries"]) == 2
+
+    @pytest.mark.asyncio
+    async def test_get_nonexistant_journal(self, async_client):
+        pid = PydanticObjectId()
+        response = await async_client.get(f"/api/journals/{str(pid)}")
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Journal not found"
 
     @pytest.mark.asyncio
     async def test_editor_update_journal(self, async_client):
@@ -102,8 +110,24 @@ class TestJournalRoutes:
         assert response.status_code == 200
         assert response.json() == {"message": "Journal deleted successfully"}
 
-        deleted_journal = await Journal.find_one(Journal.title == "Updated Journal")
-        assert deleted_journal is None
+    @pytest.mark.asyncio
+    async def test_admin_delete_nonexistant_journal(self, async_client):
+        user_data = {
+            "username": "admin_user",
+            "password": "Password!23",
+        }
+        response = await async_client.post(
+            "/api/token",
+            data=user_data,
+        )
+        self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+        pid = PydanticObjectId()
+        response = await async_client.delete(
+            f"/api/journals/{str(pid)}",
+            headers=self.header,
+        )
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Journal not found"}
 
     @pytest.mark.asyncio
     async def test_admin_create_journal(
@@ -121,6 +145,20 @@ class TestJournalRoutes:
         assert response.json()["description"] == "This is a test journal"
         assert response.json()["author"]["id"] == str(user.id)
         assert len(response.json()["entries"]) == 2
+
+    @pytest.mark.asyncio
+    async def test_admin_create_existing_journal(
+        self, create_test_users, async_client, journal_data
+    ):
+        user = await User.find_one(User.username == "admin_user")
+        journal_data["author"] = str(user.id)
+        response = await async_client.post(
+            "/api/journals",
+            json=journal_data,
+            headers=self.header,
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Journal already registered"
 
     @pytest.mark.asyncio
     async def test_admin_get_journal(self, create_test_users, async_client):
@@ -163,6 +201,22 @@ class TestJournalRoutes:
         assert response.json()["title"] == "Updated Journal"
         assert response.json()["description"] == "This is an updated journal"
         assert len(response.json()["entries"]) == 3
+
+    @pytest.mark.asyncio
+    async def test_admin_update_nonexistant_journal(self, async_client):
+        journal = await Journal.find_one(Journal.title == "Updated Journal")
+        updated_journal = journal.model_dump(
+            mode="json", exclude={"id", "author", "created_at", "updated_at"}
+        )
+        updated_journal["title"] = "Updated Journal"
+        pid = PydanticObjectId()
+        response = await async_client.put(
+            f"/api/journals/{str(pid)}",
+            json=updated_journal,
+            headers=self.header,
+        )
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Journal not found"
 
     @pytest.mark.asyncio
     async def test_auth_create_journal(
@@ -231,3 +285,9 @@ class TestJournalRoutes:
         journal = await Journal.find_one(Journal.title == "Updated Journal")
         response = await async_client.delete(f"/api/journals/{str(journal.id)}")
         assert response.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_list_journals(self, async_client):
+        response = await async_client.get("/api/journals")
+        assert response.status_code == 200
+        assert len(response.json()) == 1

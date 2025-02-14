@@ -11,10 +11,6 @@ class DeviceData(BaseModel):
     created_date: datetime = Field(default_factory=datetime.now)
     data: Dict[str, Any]
 
-    @before_event(Insert)
-    def set_times(self):
-        self.created_date = datetime.now()
-
     class Settings:
         name = "device_data"
 

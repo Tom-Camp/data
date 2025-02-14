@@ -38,6 +38,8 @@ async def post_device_data(
 @router.get("/devices/{device_id}", response_model=Device)
 async def get_device(device_id: PydanticObjectId):
     device = await Device.get(device_id)
+    if device is None:
+        raise HTTPException(status_code=404, detail="Device not found")
     return device
 
 

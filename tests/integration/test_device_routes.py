@@ -1,6 +1,7 @@
 from typing import List
 
 import pytest
+from beanie import PydanticObjectId
 
 from app.models.devices import Device
 
@@ -53,6 +54,16 @@ class TestDevices:
         assert response.json() == {"message": "Data received"}
 
     @pytest.mark.asyncio
+    async def test_device_incorrect_data_post(self, async_client):
+        response = await async_client.post(
+            "/api/devices/data",
+            json={"device_id": "new_device", "data": {"key": "value"}},
+            headers=self.header,
+        )
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Mismatched device ID"}
+
+    @pytest.mark.asyncio
     async def test_device_get(self, async_client):
         user_data = {
             "username": "admin_user",
@@ -78,6 +89,15 @@ class TestDevices:
         assert response.json()["updated_date"] is not None
         assert response.json()["data"][0]["data"] == {"key": "value"}
         assert response.json()["data"][0]["created_date"] is not None
+
+    @pytest.mark.asyncio
+    async def test_get_unknown_device(self, async_client):
+        response = await async_client.get(
+            "/api/devices/123456789012345678901234",
+            headers=self.header,
+        )
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Device not found"}
 
     @pytest.mark.asyncio
     async def test_device_list(self, async_client):
@@ -152,3 +172,34 @@ class TestDevices:
         response = await async_client.get("/api/devices")
         assert response.status_code == 200
         assert len(response.json()) == 0
+
+    @pytest.mark.asyncio
+    async def test_unknown_device_delete(self, async_client, create_test_users):
+        user_data = {
+            "username": "admin_user",
+            "password": "Password!23",
+        }
+        response = await async_client.post(
+            "/api/token",
+            data=user_data,
+        )
+        self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+        did = PydanticObjectId()
+        response = await async_client.delete(
+            f"/api/devices/{str(did)}",
+            headers=self.header,
+        )
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Device not found"}
+
+    @pytest.mark.asyncio
+    async def test_invalid_api_key(self, async_client):
+        response = await async_client.post(
+            "/api/devices/data",
+            json={"device_id": "posted_device", "data": {"key": "value"}},
+            headers={
+                "Content-Type": "application/json",
+                "X-API-KEY": "invalid_api_key",
+            },
+        )
+        assert response.status_code == 401
