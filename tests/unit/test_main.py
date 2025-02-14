@@ -7,7 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from app.models.users import Role
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def mock_settings():
     settings = MagicMock()
     settings.mongodb_uri = "mongodb://testdb:27017"
@@ -18,7 +18,7 @@ def mock_settings():
     return settings
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def mock_client():
     client = AsyncMock(spec=AsyncIOMotorClient)
     client.__getitem__.return_value = AsyncMock()
