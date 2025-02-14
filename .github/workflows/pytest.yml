@@ -60,7 +60,7 @@ jobs:
           echo "{\"schemaVersion\": 1, \"label\": \"tests\", \"message\": \"passing\", \"color\": \"success\"}" > tests-badge.json
 
       - name: Deploy badges
-        if: github.ref == 'refs/heads/develop'
+        if: github.base_ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
