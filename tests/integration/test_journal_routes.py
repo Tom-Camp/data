@@ -82,6 +82,7 @@ class TestJournalRoutes:
         assert response.json()["title"] == "Updated Journal"
         assert response.json()["description"] == "This is an updated journal"
         assert len(response.json()["entries"]) == 3
+        assert response.json()["updated_date"] > response.json()["created_date"]
 
     @pytest.mark.asyncio
     async def test_editor_cant_delete_journal(self, create_test_users, async_client):

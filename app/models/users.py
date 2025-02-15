@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
 from enum import Enum
 from typing import Annotated
 
-from beanie import Document, Indexed, PydanticObjectId
-from pydantic import BaseModel, EmailStr, Field
+from beanie import Indexed, PydanticObjectId
+from pydantic import BaseModel, EmailStr
+
+from app.models.base import AutoTimestampedDocument
 
 
 class Role(Enum):
@@ -12,21 +13,13 @@ class Role(Enum):
     AUTHENTICATED = 1
 
 
-class User(Document):
-    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
-    created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+class User(AutoTimestampedDocument):
     username: str
     email: Annotated[EmailStr, Indexed(unique=True)]
     password: str
     role: Role = Role.AUTHENTICATED
 
-    async def save(self, *args, **kwargs):
-        self.updated_date = datetime.now(timezone.utc)
-        return await super().save(*args, **kwargs)
-
     class Settings:
-        use_revision = True
         name = "users"
 
 

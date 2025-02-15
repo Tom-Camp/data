@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List
 
-from beanie import Document, Link, PydanticObjectId
+from beanie import Link, PydanticObjectId
 from pydantic import BaseModel, Field, field_validator
 
+from app.models.base import AutoTimestampedDocument
 from app.models.users import User
 
 
@@ -29,21 +30,13 @@ class Entry(BaseModel):
             return datetime.now()
 
 
-class Journal(Document):
-    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
+class Journal(AutoTimestampedDocument):
     title: str
     author: Link[User]
-    created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     description: str
     entries: List[Entry]
 
-    async def save(self, *args, **kwargs):
-        self.updated_date = datetime.now(timezone.utc)
-        return await super().save(*args, **kwargs)
-
     class Settings:
-        use_revision = True
         name = "journals"
 
 

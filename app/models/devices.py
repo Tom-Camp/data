@@ -2,8 +2,10 @@ import secrets
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
-from beanie import Document, PydanticObjectId
+from beanie import PydanticObjectId
 from pydantic import BaseModel, Field
+
+from app.models.base import AutoTimestampedDocument
 
 
 class DeviceData(BaseModel):
@@ -20,20 +22,12 @@ class DeviceDataCreate(BaseModel):
     data: Dict[str, Any]
 
 
-class Device(Document):
-    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
-    created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+class Device(AutoTimestampedDocument):
     device_id: str
     api_key: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     data: List[DeviceData] = []
 
-    async def save(self, *args, **kwargs):
-        self.updated_date = datetime.now(timezone.utc)
-        return await super().save(*args, **kwargs)
-
     class Settings:
-        use_revision = True
         name = "devices"
 
 

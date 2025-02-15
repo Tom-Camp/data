@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -55,6 +57,7 @@ async def update_journal(
         ]
 
     update_query = {"$set": update_data}
+    update_query["$set"]["updated_date"] = datetime.now(timezone.utc)
 
     await existing_journal.update(update_query)
     return await Journal.get(journal_id)

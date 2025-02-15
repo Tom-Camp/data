@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -32,10 +32,16 @@ class TestPages:
 
     @pytest.mark.asyncio
     async def test_page_update(self, beanie_init):
-        page = await Page.find_one(Page.title == "Test Page")
         new_body = "This is an authenticated page"
-        page.body = new_body
-        await page.save()
+        page = await Page.find_one(Page.title == "Test Page")
+        await page.update(
+            {
+                "$set": {
+                    Page.body: new_body,
+                    Page.updated_date: datetime.now(timezone.utc),
+                }
+            }
+        )
 
         updated_page = await Page.get(page.id)
         assert updated_page.body == new_body
