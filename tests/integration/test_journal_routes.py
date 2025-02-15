@@ -22,13 +22,12 @@ class TestJournalRoutes:
         )
         self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
 
-        user = await User.find_one(User.username == "editor_user")
-        journal_data["author"] = str(user.id)
         response = await async_client.post(
             "/api/journals",
             json=journal_data,
             headers=self.header,
         )
+        user = await User.find_one(User.username == "editor_user")
         assert response.status_code == 200
         assert response.json()["title"] == "Test Journal"
         assert response.json()["description"] == "This is a test journal"
@@ -83,6 +82,7 @@ class TestJournalRoutes:
         assert response.json()["title"] == "Updated Journal"
         assert response.json()["description"] == "This is an updated journal"
         assert len(response.json()["entries"]) == 3
+        assert response.json()["updated_date"] > response.json()["created_date"]
 
     @pytest.mark.asyncio
     async def test_editor_cant_delete_journal(self, create_test_users, async_client):

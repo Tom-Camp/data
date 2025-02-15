@@ -11,6 +11,7 @@ from app.auth import pwd_context  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models.devices import Device  # noqa: E402
 from app.models.journals import Journal  # noqa: E402
+from app.models.pages import Page  # noqa: E402
 from app.models.users import Role, User  # noqa: E402
 
 
@@ -19,7 +20,7 @@ async def beanie_init():
     client = AsyncMongoMockClient()
     await init_beanie(
         database=client["testdb"],
-        document_models=[User, Journal, Device],
+        document_models=[User, Journal, Device, Page],
     )
     return client
 

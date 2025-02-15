@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -15,7 +17,10 @@ async def create_journal(
     existing_journal = await Journal.find_one(Journal.title == journal.title)
     if existing_journal:
         raise HTTPException(status_code=400, detail="Journal already registered")
-    new_journal = Journal(**journal.model_dump())
+    new_journal = Journal(
+        **journal.model_dump(),
+        author=user,
+    )
     await new_journal.insert()
     return new_journal
 
@@ -52,6 +57,7 @@ async def update_journal(
         ]
 
     update_query = {"$set": update_data}
+    update_query["$set"]["updated_date"] = datetime.now(timezone.utc)
 
     await existing_journal.update(update_query)
     return await Journal.get(journal_id)

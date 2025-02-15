@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import pytest
 
 from app.models.users import User
@@ -29,12 +31,17 @@ class TestUserModel:
     @pytest.mark.asyncio
     async def test_user_update(self, beanie_init, create_test_users):
         user = await User.find_one(User.username == "auth_user")
-        new_email = "authenticated@example.com"
-        user.email = new_email
-        await user.save()
+        await user.update(
+            {
+                "$set": {
+                    User.email: "authenticated@example.com",
+                    User.updated_date: datetime.now(timezone.utc),
+                }
+            }
+        )
 
         updated_user = await User.get(user.id)
-        assert updated_user.email == new_email
+        assert updated_user.email == "authenticated@example.com"
 
     @pytest.mark.asyncio
     async def test_user_delete(self, beanie_init):
