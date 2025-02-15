@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from beanie import Document, Link, PydanticObjectId
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from app.models.users import User
 
@@ -21,3 +21,8 @@ class Page(Document):
     class Settings:
         use_revision = True
         name = "pages"
+
+
+class PageCreate(BaseModel):
+    title: str
+    body: str

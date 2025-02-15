@@ -49,7 +49,6 @@ class Journal(Document):
 
 class JournalCreate(BaseModel):
     title: str
-    author: Link[User]
     description: str
     entries: List[Entry]
 

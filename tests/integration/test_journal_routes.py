@@ -22,13 +22,12 @@ class TestJournalRoutes:
         )
         self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
 
-        user = await User.find_one(User.username == "editor_user")
-        journal_data["author"] = str(user.id)
         response = await async_client.post(
             "/api/journals",
             json=journal_data,
             headers=self.header,
         )
+        user = await User.find_one(User.username == "editor_user")
         assert response.status_code == 200
         assert response.json()["title"] == "Test Journal"
         assert response.json()["description"] == "This is a test journal"

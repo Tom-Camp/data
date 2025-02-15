@@ -12,7 +12,7 @@ from app.models.devices import Device
 from app.models.journals import Journal
 from app.models.pages import Page
 from app.models.users import Role, User
-from app.routes import device_routes, journal_routes, user_routes
+from app.routes import device_routes, journal_routes, page_routes, user_routes
 
 
 async def init_db():
@@ -62,6 +62,7 @@ app = FastAPI(
 
 app.include_router(device_routes.router, prefix="/api")
 app.include_router(journal_routes.router, prefix="/api")
+app.include_router(page_routes.router, prefix="/api")
 app.include_router(user_routes.router, prefix="/api")
 
 

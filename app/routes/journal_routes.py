@@ -15,7 +15,10 @@ async def create_journal(
     existing_journal = await Journal.find_one(Journal.title == journal.title)
     if existing_journal:
         raise HTTPException(status_code=400, detail="Journal already registered")
-    new_journal = Journal(**journal.model_dump())
+    new_journal = Journal(
+        **journal.model_dump(),
+        author=user,
+    )
     await new_journal.insert()
     return new_journal
 
