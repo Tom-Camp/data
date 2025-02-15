@@ -1,20 +1,27 @@
 # Tom.Camp Data
 
-A modern FastAPI application using MongoDB with Beanie ODM, UV for dependency management, and comprehensive testing
-setup. The application is configured to run with the application and the database running in Docker containers
-using docker-compose.
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![fastapi: framework](https://img.shields.io/badge/fastapi-framework-blue.svg)](https://fastapi.tiangolo.com/)
+[![mongodb: database](https://img.shields.io/badge/mongodb-database-blue.svg)](https://www.mongodb.com/)
+[![beanie: odm](https://img.shields.io/badge/beanie-odm-blue.svg)](https://github.com/BeanieODM/beanie)
+![Tests](https://raw.githubusercontent.com/Tom-Camp/data/badges/tests-badge.json)
+![Coverage](https://raw.githubusercontent.com/Tom-Camp/data/badges/coverage-badge.json)
 
-The site is configured to ingest and serve data from different sources, using both API key and username and
-password authentication.
+A modern FastAPI application using MongoDB with Beanie ODM, and UV for dependency management. The
+application is configured to run with the application and the database running in Docker
+containers using docker-compose.
+
+The site is configured to ingest and serve data from different sources, using both API key and
+username and password authentication.
 
 ## Features
 
-* FastAPI for building high-performance APIs
-* MongoDB integration using Beanie ODM
+* [FastAPI](https://fastapi.tiangolo.com/) for building high-performance APIs
+* [MongoDB](https://www.mongodb.com/) integration using Beanie ODM
 * Async database operations
 * Comprehensive test suite with pytest
-* Code quality tools with pre-commit hooks
-* Dependency management with UV
+* Code quality tools with [pre-commit](https://pre-commit.com/) hooks
+* Dependency management with [UV](https://docs.astral.sh/uv/)
 
 ## Prerequisites
 
@@ -98,6 +105,7 @@ uv run pytest --cov=app tests/
 ## Pre-commit Hooks
 
 * trailing-whitespace
+* check-yaml
 * end-of-file-fixer
 * [isort](https://github.com/pycqa/isort)
 * [flake8](https://github.com/PyCQA/flake8)

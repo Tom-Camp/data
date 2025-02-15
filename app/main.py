@@ -3,22 +3,23 @@ from contextlib import asynccontextmanager
 from beanie import init_beanie
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.auth import pwd_context
 from app.config import settings
 from app.models.devices import Device
 from app.models.journals import Journal
+from app.models.pages import Page
 from app.models.users import Role, User
-from app.routes import device_routes, journal_routes, user_routes
+from app.routes import device_routes, journal_routes, page_routes, user_routes
 
 
 async def init_db():
     client = AsyncIOMotorClient(settings.mongodb_uri)
     await init_beanie(
         database=client[settings.mongo_db],
-        document_models=[User, Journal, Device],
+        document_models=[User, Journal, Device, Page],
     )
     return client
 
@@ -61,7 +62,13 @@ app = FastAPI(
 
 app.include_router(device_routes.router, prefix="/api")
 app.include_router(journal_routes.router, prefix="/api")
+app.include_router(page_routes.router, prefix="/api")
 app.include_router(user_routes.router, prefix="/api")
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse(url="/docs")
 
 
 @app.exception_handler(RequestValidationError)

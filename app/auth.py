@@ -44,8 +44,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     try:
         payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
     except InvalidTokenError:
         raise credentials_exception
 
@@ -55,19 +53,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     return user
 
 
-async def get_current_user_with_role(
-    current_user: User = Depends(get_current_user),
-    required_role: Role = Role.AUTHENTICATED,
-) -> User:
-    if required_role and current_user.role.value < required_role.value:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    return current_user
-
-
 def require_role(required_role: Role):
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
         if required_role and current_user.role.value < required_role.value:
-            raise HTTPException(status_code=403, detail="Not enough permissions")
+            raise HTTPException(status_code=403, detail="Permission denied")
         return current_user
 
     return role_checker
