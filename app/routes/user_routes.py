@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -71,6 +73,7 @@ async def update_user(
 
     update_data = updated_user.model_dump(exclude_unset=True)
     update_data["password"] = pwd_context.hash(updated_user.password)
+    update_data["updated_date"] = datetime.now(timezone.utc)
 
     update_query = {"$set": update_data}
 
