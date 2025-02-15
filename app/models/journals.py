@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
-from beanie import Document, Insert, Link, PydanticObjectId, Update, before_event
+from beanie import Document, Link, PydanticObjectId
 from pydantic import BaseModel, Field, field_validator
 
 from app.models.users import User
@@ -33,28 +33,22 @@ class Journal(Document):
     id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
     title: str
     author: Link[User]
-    created_date: datetime | None = None
-    updated_date: datetime | None = None
+    created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     description: str
     entries: List[Entry]
 
-    @before_event(Insert)
-    async def set_times(self):
-        self.created_date = datetime.now()
-        self.updated_date = datetime.now()
-
-    @before_event(Update)
-    async def update_times(self):
-        self.updated_date = datetime.now()
+    async def save(self, *args, **kwargs):
+        self.updated_date = datetime.now(timezone.utc)
+        return await super().save(*args, **kwargs)
 
     class Settings:
+        use_revision = True
         name = "journals"
 
 
 class JournalCreate(BaseModel):
     title: str
-    created_date: datetime | None = None
-    updated_date: datetime | None = None
     author: Link[User]
     description: str
     entries: List[Entry]

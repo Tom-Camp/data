@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Annotated
 
-from beanie import Document, Indexed, Insert, PydanticObjectId, Update, before_event
+from beanie import Document, Indexed, PydanticObjectId
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -14,23 +14,19 @@ class Role(Enum):
 
 class User(Document):
     id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
-    created_date: datetime | None = None
-    updated_date: datetime | None = None
+    created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     username: str
     email: Annotated[EmailStr, Indexed(unique=True)]
     password: str
     role: Role = Role.AUTHENTICATED
 
-    @before_event(Insert)
-    def set_times(self):
-        self.created_date = datetime.now()
-        self.updated_date = datetime.now()
-
-    @before_event(Update)
-    def update_time(self):
-        self.updated_date = datetime.now()
+    async def save(self, *args, **kwargs):
+        self.updated_date = datetime.now(timezone.utc)
+        return await super().save(*args, **kwargs)
 
     class Settings:
+        use_revision = True
         name = "users"
 
 

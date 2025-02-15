@@ -1,14 +1,14 @@
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
-from beanie import Document, Insert, PydanticObjectId, Update, before_event
+from beanie import Document, PydanticObjectId
 from pydantic import BaseModel, Field
 
 
 class DeviceData(BaseModel):
     id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
-    created_date: datetime = Field(default_factory=datetime.now)
+    created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     data: Dict[str, Any]
 
     class Settings:
@@ -22,22 +22,18 @@ class DeviceDataCreate(BaseModel):
 
 class Device(Document):
     id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
-    created_date: datetime | None = None
-    updated_date: datetime | None = None
+    created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     device_id: str
     api_key: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     data: List[DeviceData] = []
 
-    @before_event(Insert)
-    def set_times(self):
-        self.created_date = datetime.now()
-        self.updated_date = datetime.now()
-
-    @before_event(Update)
-    def update_time(self):
-        self.updated_date = datetime.now()
+    async def save(self, *args, **kwargs):
+        self.updated_date = datetime.now(timezone.utc)
+        return await super().save(*args, **kwargs)
 
     class Settings:
+        use_revision = True
         name = "devices"
 
 
