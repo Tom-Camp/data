@@ -42,16 +42,27 @@ async def get_page(page_id: str):
 async def update_page(
     page_id: str, page: PageCreate, user: User = Depends(require_role(Role.EDITOR))
 ):
-    update_data = {
-        k: v for k, v in page.model_dump(exclude_unset=True).items() if v is not None
-    }
     existing_page: Page = await Page.get(page_id)
     if not existing_page:
         raise HTTPException(status_code=404, detail="Page not found")
     await existing_page.fetch_link("author")
-    if existing_page.author.id != user.id:
+    if existing_page.author.id != user.id and user.role != Role.ADMIN:
         raise HTTPException(status_code=403, detail="Permission denied")
 
+    update_data = {
+        key: value
+        for key, value in page.model_dump(exclude_unset=True).items()
+        if value is not None
+    }
     update_data["updated_date"] = datetime.now(timezone.utc)
     await existing_page.update({"$set": update_data})
     return await Page.get(page_id)
+
+
+@router.delete("/pages/{page_id}")
+async def delete_page(page_id: str, user: User = Depends(require_role(Role.ADMIN))):
+    page = await Page.get(page_id)
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    await page.delete()
+    return {"detail": "Page deleted"}
