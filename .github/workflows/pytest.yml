@@ -19,6 +19,8 @@ jobs:
       MONGO_PASS: dummy
       MONGO_PORT: 27017
       MONGO_USER: dummy
+      DB_USER: test_user
+      DB_PASS: dummy
       SECRET_KEY: test_secret_key
       HASH_ALGORITHM: HS256
       INITIAL_USER_NAME: test_user
