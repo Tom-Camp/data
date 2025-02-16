@@ -20,7 +20,10 @@ class Settings(BaseSettings):
 
     @property
     def mongodb_uri(self):
-        return f"mongodb://{self.db_user}:{self.db_pass}@{self.mongo_host}:{self.mongo_port}/{self.mongo_db}"
+        return (
+            f"mongodb://{self.db_user}:{self.db_pass}@{self.mongo_host}:{self.mongo_port}/"
+            f"{self.mongo_db}?authSource=admin"
+        )
 
 
 settings = Settings()
