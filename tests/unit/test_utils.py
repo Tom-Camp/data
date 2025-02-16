@@ -36,8 +36,9 @@ async def test_mongodb_uri():
     os.environ["MONGO_PASS"] = "test"
     os.environ["MONGO_PORT"] = "27017"
     os.environ["MONGO_USER"] = "tester"
+    os.environ["DB_USER"] = "testuser"
+    os.environ["DB_PASS"] = "test_pass"
     settings = Settings()
     assert (
-        settings.mongodb_uri
-        == "mongodb://tester:test@localhost:27017/mongo_api?authSource=admin"
+        settings.mongodb_uri == "mongodb://testuser:test_pass@localhost:27017/mongo_api"
     )

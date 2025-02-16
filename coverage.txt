@@ -2,8 +2,8 @@ Name                                       Stmts   Miss  Cover
 --------------------------------------------------------------
 app/__init__.py                                0      0   100%
 app/auth.py                                   49      0   100%
-app/config.py                                 18      0   100%
-app/main.py                                   47      0   100%
+app/config.py                                 20      0   100%
+app/main.py                                   50      0   100%
 app/models/__init__.py                         0      0   100%
 app/models/base.py                            12      0   100%
 app/models/devices.py                         29      0   100%
@@ -26,6 +26,6 @@ tests/unit/test_journals.py                   51      0   100%
 tests/unit/test_main.py                       74      1    99%
 tests/unit/test_pages.py                      35      0   100%
 tests/unit/test_users.py                      30      0   100%
-tests/unit/test_utils.py                      30      0   100%
+tests/unit/test_utils.py                      32      0   100%
 --------------------------------------------------------------
-TOTAL                                       1272      1    99%
+TOTAL                                       1279      1    99%

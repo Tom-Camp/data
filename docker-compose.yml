@@ -6,7 +6,10 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
 
   mongodb:
     image: mongo:latest
@@ -26,16 +29,42 @@ services:
       retries: 3
       start_period: 30s
     restart: unless-stopped
+    networks:
+      - app-network
+
+  mongo-init:
+    image: mongo:latest
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: >
+      mongosh --host mongodb -u ${MONGO_USER} -p ${MONGO_PASS} --authenticationDatabase admin
+      --eval '
+      db = db.getSiblingDB("${MONGO_DB}");
+      db.createUser({
+        user: "${DB_USER}",
+        pwd: "${DB_PASS}",
+        roles: [{ role: "readWrite", db: "${MONGO_DB}" }]
+      });
+      '
+    networks:
+      - app-network
 
   mongo-backup:
     image: brammys/mongodump
     volumes:
       - /opt/backup/mongodump:/backups
     environment:
-      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_URI=mongodb://${DB_USER}:${DB_PASS}@mongodb:27017/${MONGO_DB}
       - CRON_SCHEDULE=0 5 * * *
       - DELETE_AFTER=14
+    networks:
+      - app-network
 
 volumes:
   mongodb-data:
     name: mongodb-data
+
+networks:
+  app-network:
+    driver: bridge
