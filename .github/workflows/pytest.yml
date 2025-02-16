@@ -1,4 +1,4 @@
-name: Run Unit Test via Pytest
+name: Tests with Pytest and Coverage
 
 on:
   push:
