@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     mongo_pass: str
     mongo_port: str
     mongo_user: str
+    db_user: str
+    db_pass: str
     secret_key: str
     hash_algorithm: str
     initial_user_name: str
@@ -18,10 +20,7 @@ class Settings(BaseSettings):
 
     @property
     def mongodb_uri(self):
-        return (
-            f"mongodb://{self.mongo_user}:{self.mongo_pass}@{self.mongo_host}:{self.mongo_port}/"
-            f"{self.mongo_db}?authSource=admin"
-        )
+        return f"mongodb://{self.db_user}:{self.db_pass}@{self.mongo_host}:{self.mongo_port}/{self.mongo_db}"
 
 
 settings = Settings()
