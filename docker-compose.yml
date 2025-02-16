@@ -27,6 +27,15 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  mongo-backup:
+    image: brammys/mongodump
+    volumes:
+      - /opt/backup/mongodump:/backups
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - CRON_SCHEDULE=0 5 * * *
+      - DELETE_AFTER=14
+
 volumes:
   mongodb-data:
     name: mongodb-data
