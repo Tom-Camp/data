@@ -43,6 +43,26 @@ async def get_device(device_id: PydanticObjectId):
     return device
 
 
+@router.put("/devices/{device_id}", response_model=Device)
+async def update_device(
+    device_id: PydanticObjectId,
+    updated_device: DeviceCreate,
+    user: User = Depends(require_role(Role.ADMIN)),
+):
+    existing_device = await Device.get(device_id)
+    if not existing_device:
+        raise HTTPException(status_code=404, detail="Device not found")
+
+    update_data = {
+        key: value
+        for key, value in updated_device.model_dump(exclude_unset=True).items()
+        if value is not None
+    }
+
+    await existing_device.update({"$set": update_data})
+    return await Device.get(device_id)
+
+
 @router.get("/devices/{device_id}/key")
 async def get_device_api_key(
     device_id: PydanticObjectId, user: User = Depends(require_role(Role.ADMIN))

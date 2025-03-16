@@ -41,5 +41,5 @@ async def test_mongodb_uri():
     settings = Settings()
     assert (
         settings.mongodb_uri
-        == "mongodb://testuser:test_pass@localhost:27017/mongo_api?authSource=admin"
+        == "mongodb://testuser:test_pass@localhost:27017/mongo_api?authSource=mongo_api"
     )
