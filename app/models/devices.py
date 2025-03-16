@@ -25,6 +25,7 @@ class DeviceDataCreate(BaseModel):
 class Device(AutoTimestampedDocument):
     device_id: str
     api_key: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
+    notes: dict = {}
     data: List[DeviceData] = []
 
     class Settings:
@@ -33,6 +34,7 @@ class Device(AutoTimestampedDocument):
 
 class DeviceCreate(BaseModel):
     device_id: str
+    notes: dict = {}
 
 
 class DevicePublic(BaseModel):
@@ -40,4 +42,5 @@ class DevicePublic(BaseModel):
     created_date: datetime
     updated_date: datetime
     device_id: str
+    notes: dict
     data: List[DeviceData]
