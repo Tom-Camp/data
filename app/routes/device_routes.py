@@ -32,7 +32,7 @@ async def post_device_data(
 
     device.data.append(DeviceData(data=device_data.data))
     await device.save()
-    return {"message": "Data received"}
+    return {"notes": device.notes}
 
 
 @router.get("/devices/{device_id}", response_model=Device)
