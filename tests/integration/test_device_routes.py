@@ -65,7 +65,10 @@ class TestDevices:
             headers=self.header,
         )
         assert response.status_code == 200
-        assert response.json() == {"message": "Data received"}
+        assert response.json()["notes"] == {
+            "step1": "Do something",
+            "step2": "Do something else",
+        }
 
     @pytest.mark.asyncio
     async def test_device_incorrect_data_post(self, async_client):
