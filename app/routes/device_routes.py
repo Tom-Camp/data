@@ -23,7 +23,7 @@ async def register_device(
     return new_device
 
 
-@router.post("/devices/data")
+@router.post("/devices/data", response_model=dict)
 async def post_device_data(
     device_data: DeviceDataCreate, device: Device = Depends(validate_api_key)
 ):
@@ -32,7 +32,7 @@ async def post_device_data(
 
     device.data.append(DeviceData(data=device_data.data))
     await device.save()
-    return {"message": "Data received"}
+    return {"notes": device.notes}
 
 
 @router.get("/devices/{device_id}", response_model=Device)
@@ -41,6 +41,14 @@ async def get_device(device_id: PydanticObjectId):
     if device is None:
         raise HTTPException(status_code=404, detail="Device not found")
     return device
+
+
+@router.get("/devices/{device_id}/notes", response_model=dict)
+async def get_device_notes(device_id: PydanticObjectId):
+    device = await Device.get(device_id)
+    if device is None:
+        raise HTTPException(status_code=404, detail="Device not found")
+    return {"notes": device.notes}
 
 
 @router.put("/devices/{device_id}", response_model=Device)

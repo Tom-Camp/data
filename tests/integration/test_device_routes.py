@@ -60,13 +60,15 @@ class TestDevices:
             "/api/devices/data",
             json={
                 "device_id": device.device_id,
-                "notes": device.notes,
                 "data": {"key": "value"},
             },
             headers=self.header,
         )
         assert response.status_code == 200
-        assert response.json() == {"message": "Data received"}
+        assert response.json()["notes"] == {
+            "step1": "Do something",
+            "step2": "Do something else",
+        }
 
     @pytest.mark.asyncio
     async def test_device_incorrect_data_post(self, async_client):
@@ -104,6 +106,28 @@ class TestDevices:
         assert response.json()["updated_date"] is not None
         assert response.json()["data"][0]["data"] == {"key": "value"}
         assert response.json()["data"][0]["created_date"] is not None
+
+    @pytest.mark.asyncio
+    async def test_device_get_notes(self, async_client):
+        user_data = {
+            "username": "admin_user",
+            "password": "Password!23",
+        }
+        response = await async_client.post(
+            "/api/token",
+            data=user_data,
+        )
+        self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
+        device = await Device.find_one({"device_id": "posted_device"})
+        response = await async_client.get(
+            f"/api/devices/{str(device.id)}/notes",
+            headers=self.header,
+        )
+        assert response.status_code == 200
+        assert response.json()["notes"] == {
+            "step1": "Do something",
+            "step2": "Do something else",
+        }
 
     @pytest.mark.asyncio
     async def test_device_update(self, async_client, create_test_users):
