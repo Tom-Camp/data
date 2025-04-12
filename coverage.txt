@@ -6,7 +6,7 @@ app/config.py                                 20      0   100%
 app/main.py                                   50      0   100%
 app/models/__init__.py                         0      0   100%
 app/models/base.py                            12      0   100%
-app/models/devices.py                         32      0   100%
+app/models/devices.py                         33      0   100%
 app/models/journals.py                        38      0   100%
 app/models/pages.py                           13      0   100%
 app/models/users.py                           25      0   100%
@@ -28,4 +28,4 @@ tests/unit/test_pages.py                      35      0   100%
 tests/unit/test_users.py                      30      0   100%
 tests/unit/test_utils.py                      32      0   100%
 --------------------------------------------------------------
-TOTAL                                       1220      2    99%
+TOTAL                                       1221      2    99%

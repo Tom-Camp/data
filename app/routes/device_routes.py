@@ -50,6 +50,7 @@ async def get_device(
         {"$match": {"_id": device_id}},
         {
             "$project": {
+                "id": 1,
                 "created_date": 1,
                 "updated_date": 1,
                 "device_id": 1,
@@ -62,7 +63,7 @@ async def get_device(
     result = await collection.aggregate(pipeline).to_list(length=1)
     if not result:
         raise HTTPException(status_code=404, detail="Device not found")
-    return DevicePublic(**result[0])
+    return Device(**result[0])
 
 
 @router.get("/devices/{device_id}/notes", response_model=dict)

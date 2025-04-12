@@ -3,12 +3,14 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from beanie import PydanticObjectId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.base import AutoTimestampedDocument
 
 
 class DeviceData(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
     created_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     data: Dict[str, Any]
@@ -38,7 +40,7 @@ class DeviceCreate(BaseModel):
 
 
 class DevicePublic(BaseModel):
-    _id: PydanticObjectId
+    id: PydanticObjectId
     created_date: datetime
     updated_date: datetime
     device_id: str
