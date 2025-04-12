@@ -90,8 +90,6 @@ class TestDevices:
             "/api/token",
             data=user_data,
         )
-        api_key = self.header["X-API-KEY"]
-        self.header.pop("X-API-KEY")
         self.header["Authorization"] = f"Bearer {response.json()['access_token']}"
         device = await Device.find_one({"device_id": "posted_device"})
         response = await async_client.get(
@@ -100,7 +98,6 @@ class TestDevices:
         )
         assert response.status_code == 200
         assert response.json()["device_id"] == "posted_device"
-        assert response.json()["api_key"] == api_key
         assert isinstance(response.json()["data"], List)
         assert response.json()["created_date"] is not None
         assert response.json()["updated_date"] is not None

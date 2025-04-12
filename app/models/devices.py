@@ -38,7 +38,7 @@ class DeviceCreate(BaseModel):
 
 
 class DevicePublic(BaseModel):
-    id: PydanticObjectId
+    _id: PydanticObjectId
     created_date: datetime
     updated_date: datetime
     device_id: str
