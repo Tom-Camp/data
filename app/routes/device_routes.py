@@ -1,5 +1,8 @@
+from typing import Optional
+
 from beanie import PydanticObjectId
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from motor.core import AgnosticCollection
 
 from app.auth import require_role, validate_api_key
 from app.models.devices import (
@@ -35,12 +38,31 @@ async def post_device_data(
     return {"notes": device.notes}
 
 
-@router.get("/devices/{device_id}", response_model=Device)
-async def get_device(device_id: PydanticObjectId):
-    device = await Device.get(device_id)
-    if device is None:
+@router.get("/devices/{device_id}", response_model=DevicePublic)
+async def get_device(
+    device_id: PydanticObjectId,
+    data_limit: Optional[int] = Query(
+        24, description="Limit the number of data points returned"
+    ),
+):
+    data_limit = max(0, data_limit) if data_limit is not None else 24
+    pipeline = [
+        {"$match": {"_id": device_id}},
+        {
+            "$project": {
+                "created_date": 1,
+                "updated_date": 1,
+                "device_id": 1,
+                "notes": 1,
+                "data": {"$slice": ["$data", -data_limit]},
+            }
+        },
+    ]
+    collection: AgnosticCollection = Device.get_motor_collection()
+    result = await collection.aggregate(pipeline).to_list(length=1)
+    if not result:
         raise HTTPException(status_code=404, detail="Device not found")
-    return device
+    return DevicePublic(**result[0])
 
 
 @router.get("/devices/{device_id}/notes", response_model=dict)
