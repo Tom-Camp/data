@@ -61,12 +61,9 @@ app = FastAPI(
     title=settings.app_name,
 )
 
-
-origins = ["http://localhost:8080", "https://tom.camp"]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
