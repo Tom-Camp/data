@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     initial_user_name: str
     initial_user_mail: str
     initial_user_pass: str
+    cors_origins: list[str] | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
