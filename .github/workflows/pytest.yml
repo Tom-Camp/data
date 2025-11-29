@@ -14,6 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      CORS_ORIGINS: '["http://localhost:8000"]'
       MONGO_DB: testdb
       MONGO_HOST: localhost
       MONGO_PASS: dummy
