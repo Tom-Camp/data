@@ -1,0 +1,70 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS}
+      - MONGO_INITDB_DATABASE=${MONGO_DB}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  mongo-init:
+    image: mongo:latest
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: >
+      mongosh --host mongodb -u ${MONGO_USER} -p ${MONGO_PASS} --authenticationDatabase admin
+      --eval '
+      db = db.getSiblingDB("${MONGO_DB}");
+      db.createUser({
+        user: "${DB_USER}",
+        pwd: "${DB_PASS}",
+        roles: [{ role: "readWrite", db: "${MONGO_DB}" }]
+      });
+      '
+    networks:
+      - app-network
+
+  mongo-backup:
+    image: brammys/mongodump
+    volumes:
+      - /opt/backup/mongodump:/backups
+    environment:
+      - MONGO_URI=mongodb://${DB_USER}:${DB_PASS}@mongodb:27017/${MONGO_DB}
+      - CRON_SCHEDULE=0 5 * * *
+      - DELETE_AFTER=14
+    networks:
+      - app-network
+
+volumes:
+  mongodb-data:
+    name: mongodb-data
+
+networks:
+  app-network:
+    driver: bridge
